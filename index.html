@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GHMC CivicPulse | Greater Hyderabad Municipal Corporation</title>
+  <meta name="description" content="GHMC CivicPulse — AI-powered municipal infrastructure defect reporting and SLA accountability for Greater Hyderabad. Report potholes, water leaks, streetlight outages and track resolution live.">
+  
+  <!-- Resource Hints: DNS Prefetch & Preconnect for fast loading -->
+  <link rel="dns-prefetch" href="https://images.unsplash.com">
+  <link rel="preconnect" href="https://images.unsplash.com" crossorigin>
+  <link rel="dns-prefetch" href="https://a.basemaps.cartocdn.com">
+  <link rel="dns-prefetch" href="https://b.basemaps.cartocdn.com">
+  <link rel="dns-prefetch" href="https://c.basemaps.cartocdn.com">
+  <link rel="dns-prefetch" href="https://d.basemaps.cartocdn.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Leaflet Maps CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+  <!-- App Custom Styles -->
+  <link rel="stylesheet" href="css/design-system.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
+</head>
+
+<body>
+
+  <!-- ==========================================================================
+       HEADER & NAVIGATION BAR
+       ========================================================================== -->
+  <header class="app-header">
+    <!-- Top Civic Utility Banner -->
+    <div class="system-banner">
+      <div class="system-status-indicator" style="display:flex;align-items:center;gap:0.5rem;">
+        <span class="pulse-dot"></span>
+        <span class="font-semibold" style="color: #cbd5e1;">GHMC COMMAND DISPATCH &bull; HYDERABAD, TELANGANA &bull; SLA LIVE</span>
+      </div>
+      
+      <div class="flex items-center gap-3">
+        <button id="btn-reset-data" class="text-xs text-slate-400 hover:text-white transition-colors" title="Reset dataset to clean seed state">
+          <i class="fa-solid fa-rotate-left"></i> Reset Demo Data
+        </button>
+        <span style="color: rgba(255,255,255,0.2);">|</span>
+        <div class="role-switcher">
+          <i class="fa-solid fa-user-gear text-slate-400"></i>
+          <label for="role-select" class="sr-only">Switch Workspace Role</label>
+          <select id="role-select">
+            <option value="citizen">Role: Citizen (Public)</option>
+            <option value="staff">Role: Municipal Staff Queue</option>
+            <option value="admin">Role: City Admin Routing Rules</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Navigation Bar -->
+    <nav class="navbar">
+      <a href="#" class="brand-logo" onclick="window.uiController.switchView('home')">
+        <div class="brand-logo-icon">
+          <i class="fa-solid fa-city text-white text-lg"></i>
+        </div>
+        <div>
+          <span>GHMC</span>
+          <span class="brand-tagline">Greater Hyderabad Municipal Corporation</span>
+        </div>
+      </a>
+
+      <ul class="nav-links">
+        <li><a href="#" class="nav-link active" data-view="home">Home</a></li>
+        <li><a href="#" class="nav-link" data-view="public-map"><i class="fa-solid fa-map-location-dot"></i> Live Map</a></li>
+        <li><a href="#" class="nav-link" data-view="accountability"><i class="fa-solid fa-chart-column"></i> City SLA Stats</a></li>
+        <li>
+          <button id="btn-report-nav" class="nav-cta">
+            <i class="fa-solid fa-circle-plus"></i> Report Issue
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ==========================================================================
+       MAIN VIEW CONTAINER
+       ========================================================================== -->
+  <main class="main-content">
+
+    <!-- ----------------------------------------------------------------------
+         1. VIEW: HOME & LANDING HERO
+         ---------------------------------------------------------------------- -->
+    <section id="view-home" class="view-section active">
+      <div class="hero-section">
+        <div class="hero-container">
+          <div>
+            <div class="hero-badge">
+              <i class="fa-solid fa-bolt-lightning text-yellow-400"></i> AI-Powered Auto-Routing &bull; Real-Time SLA Transparency
+            </div>
+            <h1 class="hero-title">Hyderabad's Infrastructure,<br><span class="hero-title-gold">Fixed with Transparency.</span></h1>
+            <p class="hero-subtitle">
+              GHMC CivicPulse — snap a geotagged photo of potholes, pipe bursts, fallen trees or dark streetlights. AI classifies severity and auto-routes to the right GHMC department — track resolution live on map.
+            </p>
+            <div class="hero-actions">
+              <button id="btn-report-hero" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-camera"></i> Report Infrastructure Issue
+              </button>
+              <button onclick="window.uiController.switchView('public-map')" class="btn btn-secondary btn-lg">
+                <i class="fa-solid fa-map"></i> View Live City Map
+              </button>
+            </div>
+          </div>
+
+          <!-- Hero AI Demonstration Card -->
+          <div class="hero-preview-card">
+            <div class="flex justify-between items-center mb-3">
+              <span class="badge badge-in_progress"><i class="fa-solid fa-spinner fa-spin"></i> AI Vision Processing</span>
+              <span class="text-xs text-slate-400 font-mono">GHMC-CivicVision v4</span>
+            </div>
+            <div style="position: relative; height: 180px; border-radius: 12px; overflow: hidden; margin-bottom: 12px; background:#1d1d1f;">
+              <img src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=600&q=75" loading="eager" decoding="async" style="width: 100%; height: 100%; object-fit: cover;" alt="Pothole on Hyderabad Road" />
+              <div style="position: absolute; top: 20px; left: 30px; width: 150px; height: 90px; border: 2px dashed #d4af37; background: rgba(212,175,55,0.15); border-radius: 6px; display: flex; align-items: center; justify-content: center;">
+                <span class="badge badge-submitted text-xs">Pothole 97.2%</span>
+              </div>
+            </div>
+            <div class="text-xs text-slate-300">
+              <p class="font-bold text-white mb-1"><i class="fa-solid fa-microchip" style="color:#d4af37;"></i> Auto-Routed → GHMC Engineering & Roads</p>
+              <p>Estimated Resolution: <strong>48-Hr SLA</strong> &bull; Tank Bund Rd, Hyderabad</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Civic Impact Metric Cards -->
+      <div class="quick-stats-grid">
+        <div class="stat-box shadow-md">
+          <div class="stat-icon-wrapper" style="background-color: #e0f2fe; color: #0284c7;">
+            <i class="fa-solid fa-bullhorn"></i>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase">Total Reports Logged</span>
+            <h3 id="stat-total-reports" class="text-2xl font-bold text-navy-900">0</h3>
+          </div>
+        </div>
+
+        <div class="stat-box shadow-md">
+          <div class="stat-icon-wrapper" style="background-color: #dcfce7; color: #16a34a;">
+            <i class="fa-solid fa-clock-rotate-left"></i>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase">Avg Time-to-Resolve</span>
+            <h3 id="stat-avg-resolution" class="text-2xl font-bold text-navy-900">2.4 days</h3>
+          </div>
+        </div>
+
+        <div class="stat-box shadow-md">
+          <div class="stat-icon-wrapper" style="background-color: #eef2ff; color: #6366f1;">
+            <i class="fa-solid fa-shield-check"></i>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase">% Resolved within SLA</span>
+            <h3 id="stat-sla-pct" class="text-2xl font-bold text-navy-900">94.8%</h3>
+          </div>
+        </div>
+
+        <div class="stat-box shadow-md">
+          <div class="stat-icon-wrapper" style="background-color: #fff7ed; color: #ea580c;">
+            <i class="fa-solid fa-truck-field"></i>
+          </div>
+          <div>
+            <span class="text-xs font-semibold text-slate-500 uppercase">Active Field Crews</span>
+            <h3 id="stat-active-crews" class="text-2xl font-bold text-navy-900">42 Crews</h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Citizen Reports Feed Section -->
+      <div style="max-width: 1200px; margin: 0 auto 4rem; padding: 0 1.5rem;">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h2 class="text-2xl font-bold text-navy-900">Live GHMC Public Report Feed</h2>
+            <p class="text-slate-500 text-sm">Real-time infrastructure issues reported by citizens across Greater Hyderabad</p>
+          </div>
+          <button onclick="window.uiController.switchView('public-map')" class="btn btn-outline">
+            View All on Live Map <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <div id="recent-reports-grid" class="grid" style="grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+          <!-- Dynamically populated by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         2. VIEW: CITIZEN REPORT WIZARD FLOW
+         ---------------------------------------------------------------------- -->
+    <section id="view-report-wizard" class="view-section">
+      <div class="wizard-container">
+        
+        <!-- Step Indicator Header -->
+        <div class="wizard-steps-indicator">
+          <div id="wizard-step-indicator-1" class="step-item active">
+            <div class="step-number">1</div>
+            <span class="step-label">Upload Photo</span>
+          </div>
+          <div id="wizard-step-indicator-2" class="step-item">
+            <div class="step-number">2</div>
+            <span class="step-label">AI AI Triage</span>
+          </div>
+          <div id="wizard-step-indicator-3" class="step-item">
+            <div class="step-number">3</div>
+            <span class="step-label">Location & Submit</span>
+          </div>
+        </div>
+
+        <div class="wizard-card">
+          
+          <!-- STEP 1: UPLOAD PHOTO -->
+          <div id="wizard-step-1" class="wizard-step-content">
+            <h2 class="text-xl font-bold text-navy-900 mb-1">Upload Infrastructure Photo</h2>
+            <p class="text-slate-500 text-sm mb-6">Take a clear picture of the defect in the field. Our AI will automatically extract GPS geotags and classify severity.</p>
+
+            <div id="wizard-dropzone" class="dropzone">
+              <i class="fa-solid fa-cloud-arrow-up text-4xl text-brand mb-3"></i>
+              <h3 class="font-bold text-navy-900 mb-1">Drag & Drop Defect Photo Here</h3>
+              <p class="text-xs text-slate-500 mb-4">Supports JPG, PNG, WEBP with EXIF metadata extraction</p>
+              <button type="button" class="btn btn-primary btn-sm">
+                <i class="fa-solid fa-camera"></i> Browse Photo / Capture Camera
+              </button>
+              <input type="file" id="wizard-file-input" class="hidden" accept="image/*" />
+            </div>
+
+            <!-- Quick Preset Demo Samples -->
+            <div class="mt-6 border-t pt-4">
+              <span class="text-xs font-bold text-slate-400 uppercase mb-2 block">Or try a sample defect photo:</span>
+              <div class="flex gap-2 flex-wrap">
+                <button type="button" class="btn btn-outline btn-sm preset-photo-btn" data-url="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=800&q=80">
+                  <i class="fa-solid fa-road text-red-500"></i> Sample Pothole
+                </button>
+                <button type="button" class="btn btn-outline btn-sm preset-photo-btn" data-url="https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80">
+                  <i class="fa-solid fa-faucet-drip text-blue-500"></i> Water Leak
+                </button>
+                <button type="button" class="btn btn-outline btn-sm preset-photo-btn" data-url="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=800&q=80">
+                  <i class="fa-solid fa-tree text-green-500"></i> Fallen Branch
+                </button>
+                <button type="button" class="btn btn-outline btn-sm preset-photo-btn" data-url="https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=800&q=80">
+                  <i class="fa-solid fa-lightbulb text-yellow-500"></i> Streetlight Outage
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: AI COMPUTER VISION CLASSIFICATION REVIEW -->
+          <div id="wizard-step-2" class="wizard-step-content hidden">
+            <!-- Loading Indicator -->
+            <div id="wizard-ai-loading" class="text-center py-12">
+              <i class="fa-solid fa-brain fa-spin text-5xl text-brand mb-4"></i>
+              <h3 class="font-bold text-navy-900 text-lg">Running Computer Vision Model...</h3>
+              <p class="text-sm text-slate-500">Extracting feature vectors, computing severity score & scanning duplicate reports</p>
+            </div>
+
+            <!-- AI Results Review Form -->
+            <div id="wizard-ai-results" class="hidden">
+              <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                <div class="image-preview-wrapper">
+                  <img id="wizard-ai-preview" src="" alt="Defect preview" />
+                  <div class="ai-scan-overlay"></div>
+                </div>
+
+                <div class="ai-audit-card">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-mono text-brand-light uppercase"><i class="fa-solid fa-microchip"></i> CivicVision v3.4</span>
+                    <span class="badge badge-submitted text-xs">Confidence <strong id="ai-confidence-score">0%</strong></span>
+                  </div>
+                  <div class="ai-confidence-bar">
+                    <div id="ai-confidence-fill" class="ai-confidence-fill" style="width: 0%;"></div>
+                  </div>
+
+                  <div class="mt-4">
+                    <span class="text-xs text-slate-400 block mb-1">AI Detected Category:</span>
+                    <h4 id="ai-category-suggestion" class="text-lg font-bold text-white mb-2">Pothole</h4>
+                    <span class="text-xs text-slate-400 block mb-1">AI Severity Score:</span>
+                    <span id="ai-severity-suggestion" class="severity-chip severity-high mb-3">HIGH</span>
+                    <p id="ai-rationale-text" class="text-xs text-slate-300 italic">Evaluating depth and traffic hazard cues...</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Low Confidence Review Alert -->
+              <div id="ai-low-confidence-warning" class="card mb-4 hidden" style="background-color: #fffbeb; border-color: #fde68a;">
+                <div class="flex items-center gap-3 text-amber-800 text-sm">
+                  <i class="fa-solid fa-triangle-exclamation text-xl text-amber-600"></i>
+                  <div>
+                    <strong class="block font-bold">AI Confidence Below 70% Safety Threshold</strong>
+                    <span>Please verify the defect category below to assist municipal triage crews.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Duplicate Report Alert -->
+              <div id="ai-duplicate-alert" class="card mb-4 hidden" style="background-color: #e0f2fe; border-color: #bae6fd;">
+                <div class="flex items-center gap-3 text-brand text-sm">
+                  <i class="fa-solid fa-layer-group text-xl"></i>
+                  <div>
+                    <strong class="block font-bold">Potential Duplicate Report Detected!</strong>
+                    <span id="duplicate-count-text">Found 1 existing report near this location.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Confirm or Override Form -->
+              <div class="card mb-6" style="background-color: #f8fafc;">
+                <h4 class="font-bold text-navy-900 text-sm mb-3">Confirm or Override AI Suggestions</h4>
+                <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                  <div class="form-group">
+                    <label for="wizard-category-override" class="form-label">Category</label>
+                    <select id="wizard-category-override" class="form-select">
+                      <option value="pothole">Pothole / Road Surface Defect</option>
+                      <option value="water_leak">Main Water Pipe Leak</option>
+                      <option value="fallen_tree_branch">Fallen Tree / Branch</option>
+                      <option value="streetlight_outage">Streetlight Outage</option>
+                      <option value="storm_drain_blockage">Clogged Storm Drain</option>
+                      <option value="hazardous_debris">Hazardous Road Debris</option>
+                      <option value="other">Other Public Defect</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="wizard-severity-override" class="form-label">Severity Level</label>
+                    <select id="wizard-severity-override" class="form-select">
+                      <option value="low">Low (Minor inconvenience)</option>
+                      <option value="medium">Medium (Moderate defect)</option>
+                      <option value="high">High (Significant hazard)</option>
+                      <option value="critical">Critical (Immediate danger / pipe burst)</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="flex justify-between">
+                <button onclick="window.uiController.wizardState.step = 1; window.uiController.renderWizardStep();" class="btn btn-outline">
+                  &larr; Back
+                </button>
+                <button id="btn-step2-next" class="btn btn-primary">
+                  Confirm & Adjust Location &rarr;
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 3: LOCATION & SUBMISSION -->
+          <div id="wizard-step-3" class="wizard-step-content hidden">
+            <h2 class="text-xl font-bold text-navy-900 mb-1">Pinpoint Exact Location</h2>
+            <p class="text-slate-500 text-sm mb-4">GPS geotag auto-captured from photo. Drag the blue pin on the map if you need to adjust exact placement.</p>
+
+            <div style="height: 280px; border-radius: 12px; overflow: hidden; margin-bottom: 1.25rem; border: 1px solid var(--color-slate-300);">
+              <div id="wizard-map" style="width:100%; height:100%;"></div>
+            </div>
+
+            <div class="grid" style="grid-template-columns: 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+              <div class="form-group">
+                <label for="wizard-lat" class="form-label">Latitude</label>
+                <input type="text" id="wizard-lat" class="form-input" readonly />
+              </div>
+              <div class="form-group">
+                <label for="wizard-lng" class="form-label">Longitude</label>
+                <input type="text" id="wizard-lng" class="form-input" readonly />
+              </div>
+              <div class="form-group">
+                <label for="wizard-ward" class="form-label">Municipal Ward</label>
+                <select id="wizard-ward" class="form-select">
+                  <option value="ward-1">Division 1 – Secunderabad & Cantonment</option>
+                  <option value="ward-2">Division 2 – Banjara Hills & Jubilee Hills</option>
+                  <option value="ward-3">Division 3 – Old City & Charminar</option>
+                  <option value="ward-4">Division 4 – Kukatpally & HITECH City</option>
+                  <option value="ward-5">Division 5 – LB Nagar & Dilsukhnagar</option>
+                  <option value="ward-6">Division 6 – Ameerpet & SR Nagar</option>
+                  <option value="ward-7">Division 7 – Mehdipatnam & Tolichowki</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group mb-6">
+              <label for="wizard-description" class="form-label">Optional Description / Landmarks</label>
+              <textarea id="wizard-description" class="form-textarea" rows="3" placeholder="Provide extra detail (e.g. 'In front of house #402, near bus stop sign')"></textarea>
+            </div>
+
+            <div class="flex justify-between">
+              <button onclick="window.uiController.wizardState.step = 2; window.uiController.renderWizardStep();" class="btn btn-outline">
+                &larr; Back
+              </button>
+              <button id="btn-step3-submit" class="btn btn-primary btn-lg">
+                <i class="fa-solid fa-paper-plane"></i> Submit Official Citizen Report
+              </button>
+            </div>
+          </div>
+
+          <!-- STEP 4: CONFIRMATION TICKET -->
+          <div id="wizard-step-4" class="wizard-step-content hidden text-center py-6">
+            <div style="width: 72px; height: 72px; background: #dcfce7; color: #16a34a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1.5rem;">
+              <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-navy-900 mb-1">Report Successfully Submitted!</h2>
+            <p class="text-slate-500 text-sm mb-6">Your issue has been logged into the public ledger and routed to municipal crews.</p>
+
+            <div class="card mb-6 text-left" style="background: var(--color-slate-50); max-width: 480px; margin-left: auto; margin-right: auto;">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs text-slate-500 font-bold uppercase">Tracking Ticket ID</span>
+                <span id="confirm-tracking-id" class="font-mono font-bold text-brand text-lg">CP-2026-XXXX</span>
+              </div>
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-xs text-slate-500 font-bold uppercase">Assigned Department</span>
+                <span id="confirm-assigned-dept" class="font-bold text-navy-900">Department of Roads</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-xs text-slate-500 font-bold uppercase">Resolution Target</span>
+                <span id="confirm-sla-hours" class="badge badge-acknowledged">48 Hours SLA</span>
+              </div>
+            </div>
+
+            <div class="flex justify-center gap-3">
+              <button onclick="window.uiController.showReportDetail(window.uiController.wizardState.createdReportId)" class="btn btn-primary">
+                View Public Timeline & Track <i class="fa-solid fa-arrow-right"></i>
+              </button>
+              <button onclick="window.uiController.switchView('home')" class="btn btn-outline">
+                Back to Home
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         3. VIEW: PUBLIC LIVE MAP DASHBOARD
+         ---------------------------------------------------------------------- -->
+    <section id="view-public-map" class="view-section">
+      <div class="map-view-layout">
+        
+        <!-- Map Control Sidebar -->
+        <aside class="map-sidebar">
+          <div class="map-sidebar-header">
+            <h2 class="text-lg font-bold text-navy-900">GHMC Infrastructure Map</h2>
+            <p class="text-xs text-slate-500">Live defect locations across Greater Hyderabad — real-time status</p>
+          </div>
+
+          <!-- Multi-Filter Toolbar -->
+          <div class="map-filters-panel">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label for="filter-map-search" class="sr-only">Search Reports</label>
+              <input type="text" id="filter-map-search" class="form-input" placeholder="Search by Ticket ID or keyword..." />
+            </div>
+
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+              <select id="filter-map-category" class="form-select text-xs">
+                <option value="all">All Categories</option>
+                <option value="pothole">Potholes</option>
+                <option value="water_leak">Water Leaks</option>
+                <option value="fallen_tree_branch">Fallen Trees</option>
+                <option value="streetlight_outage">Streetlights</option>
+                <option value="storm_drain_blockage">Storm Drains</option>
+              </select>
+
+              <select id="filter-map-status" class="form-select text-xs">
+                <option value="all">All Statuses</option>
+                <option value="submitted">Submitted</option>
+                <option value="acknowledged">Acknowledged</option>
+                <option value="in_progress">In Progress</option>
+                <option value="resolved">Resolved</option>
+              </select>
+            </div>
+
+            <select id="filter-map-severity" class="form-select text-xs">
+              <option value="all">All Severity Levels</option>
+              <option value="critical">Critical Only</option>
+              <option value="high">High</option>
+              <option value="medium">Medium</option>
+              <option value="low">Low</option>
+            </select>
+          </div>
+
+          <!-- Scrollable Report Cards List -->
+          <div id="map-sidebar-reports" class="map-report-list">
+            <!-- Dynamically populated by JS -->
+          </div>
+        </aside>
+
+        <!-- Leaflet Map Canvas Container -->
+        <main class="map-canvas-container">
+          <div id="public-map"></div>
+        </main>
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         4. VIEW: PUBLIC REPORT DETAIL & TRANSPARENCY TIMELINE
+         ---------------------------------------------------------------------- -->
+    <section id="view-report-detail" class="view-section">
+      <div class="detail-container">
+        
+        <!-- Left Main Content: Photo, Status, Map & Vertical Timeline -->
+        <div>
+          <div class="card mb-6">
+            <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+              <div>
+                <div class="flex items-center gap-2 mb-2 flex-wrap">
+                  <h1 id="detail-id-header" class="text-2xl font-bold text-navy-900">CP-2026-8801</h1>
+                  <div id="detail-category-badge"></div>
+                  <div id="detail-status-badge"></div>
+                  <div id="detail-severity-badge"></div>
+                </div>
+                <p class="text-xs text-slate-500">Official Municipal Defect Ticket &bull; Public Record</p>
+              </div>
+
+              <button class="btn btn-outline btn-sm btn-export-csv">
+                <i class="fa-solid fa-download"></i> Export Record
+              </button>
+            </div>
+
+            <!-- Issue Summary Metadata Cards -->
+            <div class="grid mb-6" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem;">
+              <div class="card" style="padding: 0.85rem; background: var(--color-slate-50);">
+                <span class="text-xs font-bold text-slate-400 uppercase block mb-1"><i class="fa-solid fa-location-dot text-brand"></i> Ward & Location</span>
+                <span id="detail-ward-name" class="font-bold text-navy-900 text-sm block">Division 1 – Secunderabad</span>
+                <span id="detail-coords" class="text-xs font-mono text-slate-500">17.38500, 78.48670</span>
+              </div>
+
+              <div class="card" style="padding: 0.85rem; background: var(--color-slate-50);">
+                <span class="text-xs font-bold text-slate-400 uppercase block mb-1"><i class="fa-solid fa-building-columns text-brand"></i> Assigned Department</span>
+                <span id="detail-dept-assigned" class="font-bold text-navy-900 text-sm block">GHMC Engineering & Roads Dept.</span>
+                <span id="detail-dept-contact" class="text-xs text-slate-500 block">roads@ghmc.gov.in | 040-2311-1111</span>
+              </div>
+
+              <div class="card" style="padding: 0.85rem; background: var(--color-slate-50);">
+                <span class="text-xs font-bold text-slate-400 uppercase block mb-1"><i class="fa-solid fa-hourglass-half text-brand"></i> SLA Resolution Target</span>
+                <span id="detail-sla-target" class="font-bold text-navy-900 text-sm block">48 Hours</span>
+                <span id="detail-sla-status" class="text-xs font-bold text-emerald-600 block">On Track</span>
+              </div>
+
+              <div class="card" style="padding: 0.85rem; background: var(--color-slate-50);">
+                <span class="text-xs font-bold text-slate-400 uppercase block mb-1"><i class="fa-solid fa-calendar-day text-brand"></i> Date Logged</span>
+                <span id="detail-created-at" class="font-bold text-navy-900 text-sm block">Aug 5, 2026</span>
+                <span id="detail-time-ago" class="text-xs text-slate-500 block">2 days ago</span>
+              </div>
+            </div>
+
+            <!-- Defect Photo -->
+            <div class="image-preview-wrapper mb-4">
+              <img id="detail-photo" src="" alt="Defect report photo" />
+            </div>
+
+            <!-- Description Box -->
+            <div class="card mb-6" style="background-color: var(--color-slate-50);">
+              <h3 class="font-bold text-navy-900 mb-1 text-sm"><i class="fa-solid fa-align-left text-brand"></i> Citizen Issue Description</h3>
+              <p id="detail-description" class="text-slate-700 text-sm leading-relaxed"></p>
+            </div>
+
+            <!-- Location Mini Map -->
+            <div class="mb-6">
+              <h3 class="font-bold text-navy-900 mb-2 text-sm"><i class="fa-solid fa-map-pin text-brand"></i> Geotag Location Map</h3>
+              <div style="height: 220px; border-radius: 12px; overflow: hidden; border: 1px solid var(--color-slate-300);">
+                <div id="detail-map" style="width: 100%; height: 100%;"></div>
+              </div>
+            </div>
+
+            <!-- Resolution Before/After Comparison Card (if resolved) -->
+            <div id="detail-resolution-photo-section" class="card mb-6 hidden" style="background-color: #f0fdf4; border-color: #bbf7d0;">
+              <h4 class="font-bold text-green-900 text-sm mb-2"><i class="fa-solid fa-circle-check text-green-600"></i> Closure Verification Photo</h4>
+              <div class="image-preview-wrapper" style="height: 200px;">
+                <img id="detail-resolution-photo" src="" alt="Resolution verification" />
+              </div>
+            </div>
+
+            <!-- Public Vertical Transparency Timeline -->
+            <h3 class="font-bold text-navy-900 mb-3 text-sm"><i class="fa-solid fa-timeline text-brand"></i> Public Transparency Timeline</h3>
+            <div id="detail-timeline-container" class="timeline">
+              <!-- Dynamically populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar: AI Audit Log & Subscription Widget -->
+        <div>
+          <!-- AI Audit Log Card -->
+          <div class="ai-audit-card mb-6">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa-solid fa-microchip text-brand-light text-xl"></i>
+              <div>
+                <h3 class="font-bold text-white text-base">AI Classification Audit</h3>
+                <span class="text-xs text-slate-400">Verifiable Deep Learning Audit Log</span>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <span class="text-xs text-slate-400 block mb-1">Model Confidence:</span>
+              <h4 id="detail-ai-confidence" class="text-2xl font-bold text-brand-light">96.4%</h4>
+            </div>
+
+            <div class="mb-4">
+              <span class="text-xs text-slate-400 block mb-1">Severity Rationale:</span>
+              <p id="detail-ai-rationale" class="text-xs text-slate-300 leading-relaxed"></p>
+            </div>
+
+            <div>
+              <span class="text-xs text-slate-400 block mb-1">Raw Telemetry JSON:</span>
+              <pre id="detail-ai-json" class="text-xs font-mono text-slate-300 bg-navy-900 p-2 rounded border border-slate-700 overflow-x-auto" style="max-height: 140px;"></pre>
+            </div>
+          </div>
+
+          <!-- Citizen Notification Subscription Box -->
+          <div class="card">
+            <h3 class="font-bold text-navy-900 text-sm mb-2"><i class="fa-solid fa-bell text-brand"></i> Subscribe to Status Updates</h3>
+            <p class="text-xs text-slate-500 mb-4">Get instant SMS or Email alerts when municipal crews update or resolve this ticket.</p>
+            <div class="form-group mb-3">
+              <label for="subscribe-contact-input" class="sr-only">Email or Phone Number</label>
+              <input type="text" id="subscribe-contact-input" class="form-input text-xs" placeholder="Email or Phone Number..." />
+            </div>
+            <button onclick="window.uiController.showToast('Subscribed to notifications for this ticket!')" class="btn btn-primary btn-sm btn-full">
+              Subscribe to Ticket Updates
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         5. VIEW: CITY ACCOUNTABILITY & LEADERBOARD DASHBOARD
+         ---------------------------------------------------------------------- -->
+    <section id="view-accountability" class="view-section">
+      <div class="accountability-container">
+        <div class="flex justify-between items-center mb-6 flex-wrap gap-3">
+          <div>
+            <h1 class="text-2xl font-bold text-navy-900">GHMC Accountability Dashboard</h1>
+            <p class="text-slate-500 text-sm">Aggregated SLA benchmarks, department rankings and open civic data for Greater Hyderabad</p>
+          </div>
+          
+          <div class="flex gap-2">
+            <button class="btn btn-primary btn-export-csv">
+              <i class="fa-solid fa-file-csv"></i> Download CSV Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Chart Analytics Grid -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <h3 class="font-bold text-navy-900 text-sm mb-3">Department SLA Target Met Rate (%)</h3>
+            <div style="height: 240px; position: relative;">
+              <canvas id="chart-sla-dept"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3 class="font-bold text-navy-900 text-sm mb-3">Open Issues by Category</h3>
+            <div style="height: 240px; position: relative;">
+              <canvas id="chart-category-breakdown"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card">
+            <h3 class="font-bold text-navy-900 text-sm mb-3">Weekly Resolution Volume Trend</h3>
+            <div style="height: 240px; position: relative;">
+              <canvas id="chart-resolution-trend"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Factual Wall of Shame & Department Leaderboard -->
+        <div class="card mb-8">
+          <h2 class="text-lg font-bold text-navy-900 mb-1">Department Performance Leaderboard</h2>
+          <p class="text-xs text-slate-500 mb-4">Objective benchmark of municipal departments sorted by SLA compliance and response speed.</p>
+
+          <div style="overflow-x: auto;">
+            <table class="leaderboard-table">
+              <thead>
+                <tr>
+                  <th>Department Name</th>
+                  <th>Total Reports</th>
+                  <th>Open Tickets</th>
+                  <th>SLA Met %</th>
+                  <th>Oldest Open Ticket</th>
+                  <th>Active Units</th>
+                </tr>
+              </thead>
+              <tbody id="accountability-leaderboard-body">
+                <!-- Dynamically populated by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         6. VIEW: MUNICIPAL STAFF QUEUE
+         ---------------------------------------------------------------------- -->
+    <section id="view-staff-queue" class="view-section">
+      <div class="staff-container">
+        
+        <div class="staff-toolbar">
+          <div>
+            <h1 class="text-2xl font-bold text-navy-900">Municipal Dispatch Queue</h1>
+            <p class="text-slate-500 text-sm">Role-based queue for field inspectors, supervisors, and repair crews</p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label for="staff-department-select" class="form-label mb-0">Department Queue:</label>
+            <select id="staff-department-select" class="form-select font-semibold" style="width: auto;">
+              <option value="dept-roads">GHMC Engineering &amp; Roads Department</option>
+              <option value="dept-water">HMWSSB Water Supply &amp; Sewerage Board</option>
+              <option value="dept-electrical">GHMC Street Lighting &amp; Electrical Works</option>
+              <option value="dept-parks">GHMC Sanitation &amp; Horticulture Division</option>
+              <option value="dept-general">GHMC Citizen Grievance Redressal Cell</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="queue-table">
+            <thead>
+              <tr>
+                <th>Ticket ID</th>
+                <th>Status</th>
+                <th>Severity</th>
+                <th>Category</th>
+                <th>Date Logged</th>
+                <th>SLA Deadline</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="staff-queue-body">
+              <!-- Dynamically populated by JS -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ----------------------------------------------------------------------
+         7. VIEW: CITY ADMIN ROUTING RULES
+         ---------------------------------------------------------------------- -->
+    <section id="view-admin-rules" class="view-section">
+      <div class="staff-container">
+        <div class="flex justify-between items-center mb-6">
+          <div>
+            <h1 class="text-2xl font-bold text-navy-900">Admin Auto-Routing Matrix</h1>
+            <p class="text-slate-500 text-sm">Configure automated dispatch rules mapping defect categories & wards to departments and SLA hours.</p>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="queue-table">
+            <thead>
+              <tr>
+                <th>Rule ID</th>
+                <th>Defect Category</th>
+                <th>Ward / District</th>
+                <th>Target Department</th>
+                <th>Target SLA Hours</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="admin-rules-body">
+              <!-- Dynamically populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       MODALS & TOAST CONTAINERS
+       ========================================================================== -->
+  <!-- Staff Action Modal -->
+  <div id="modal-staff-action" class="modal-overlay">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="font-bold text-navy-900 text-lg">Update Ticket Status & Log Activity</h3>
+        <button id="btn-close-staff-modal" class="text-slate-400 hover:text-navy-900 border-none bg-transparent text-lg cursor-pointer">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Ticket Information Preview Card -->
+        <div class="card mb-4" style="background: var(--color-slate-50); padding: 0.85rem;">
+          <div class="flex gap-3 items-center mb-2">
+            <img id="modal-staff-thumb" src="" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;" alt="Ticket thumb" />
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-1">
+                <span id="modal-staff-ticket-id" class="font-mono font-bold text-navy-900 text-sm">CP-2026-8801</span>
+                <span id="modal-staff-category-badge"></span>
+                <span id="modal-staff-severity-chip"></span>
+              </div>
+              <p id="modal-staff-ward" class="text-xs text-slate-500 font-semibold mb-1">Ward 1 - Downtown Core</p>
+              <p id="modal-staff-desc-snippet" class="text-xs text-slate-600" style="display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-staff-status-select" class="form-label">New Status Level</label>
+          <select id="modal-staff-status-select" class="form-select">
+            <option value="submitted">Submitted</option>
+            <option value="acknowledged">Acknowledged</option>
+            <option value="under_review">Under Review</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="in_progress">In Progress</option>
+            <option value="resolved">Resolved (Close Ticket)</option>
+            <option value="rejected">Rejected / Duplicate</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-staff-note" class="form-label">Department Activity Note</label>
+          <textarea id="modal-staff-note" class="form-textarea" rows="3" placeholder="Enter official progress note visible to the reporting citizen..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="modal-staff-resolution-photo" class="form-label">Optional Resolution Verification Photo URL</label>
+          <input type="text" id="modal-staff-resolution-photo" class="form-input text-xs" placeholder="https://..." />
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button onclick="window.uiController.closeStaffActionModal()" class="btn btn-outline">Cancel</button>
+        <button id="btn-save-staff-modal" class="btn btn-primary">Save Status Update</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ==========================================================================
+       SCRIPTS INGESTION
+       ========================================================================== -->
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Application Modules -->
+  <script src="js/seed-data.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/ai-engine.js"></script>
+  <script src="js/map-manager.js"></script>
+  <script src="js/charts-manager.js"></script>
+  <script src="js/ui-controller.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

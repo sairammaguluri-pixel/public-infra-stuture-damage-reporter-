@@ -1,0 +1,227 @@
+/* ==========================================================================
+   NMC CivicPulse Design System - Gold & White Apple-Inspired Luxury Palette
+   ========================================================================== */
+
+:root {
+  /* Brand Palette - Premium Metallic Gold & Pristine White */
+  --color-gold-900: #785e19;
+  --color-gold-800: #967622;
+  --color-gold-700: #b38f2b;
+  --color-gold-600: #c5a037;
+  --color-gold-500: #d4af37; /* Metallic Gold Accent */
+  --color-gold-400: #e5c158;
+  --color-gold-300: #f1d683;
+  --color-gold-200: #f8e7b4;
+  --color-gold-100: #fcf4db;
+  --color-gold-50:  #fffcf2;
+
+  /* Neutral Apple Palette */
+  --color-navy-900: #111111; /* Deepest Onyx */
+  --color-navy-800: #1d1d1f; /* Apple Charcoal */
+  --color-navy-700: #2d2d30;
+  --color-slate-600: #515154;
+  --color-slate-500: #6e6e73; /* Apple Secondary Text */
+  --color-slate-400: #86868b;
+  --color-slate-300: #d2d2d7; /* Apple Border Light */
+  --color-slate-200: #e8e8ed;
+  --color-slate-100: #f5f5f7; /* Apple Off-White Background */
+  --color-slate-50:  #fafafa;
+  --color-white:     #ffffff;
+
+  /* Primary Brand Accents - Luxury Gold Gradient Tokens */
+  --color-brand-primary: #d4af37;
+  --color-brand-primary-hover: #b38f2b;
+  --color-brand-primary-light: #fffcf2;
+  --gradient-gold: linear-gradient(135deg, #d4af37 0%, #aa7c11 100%);
+  --gradient-gold-subtle: linear-gradient(135deg, #fffcf2 0%, #fcf4db 100%);
+  --gradient-dark-glass: linear-gradient(135deg, rgba(29, 29, 31, 0.95) 0%, rgba(17, 17, 17, 0.98) 100%);
+
+  /* Status Colors */
+  --status-submitted: #6e6e73;
+  --status-submitted-bg: #f5f5f7;
+  --status-acknowledged: #3b82f6;
+  --status-acknowledged-bg: #eff6ff;
+  --status-under-review: #d97706;
+  --status-under-review-bg: #fffbeb;
+  --status-scheduled: #0891b2;
+  --status-scheduled-bg: #ecfeff;
+  --status-in-progress: #8b5cf6;
+  --status-in-progress-bg: #f5f3ff;
+  --status-resolved: #10b981;
+  --status-resolved-bg: #ecfdf5;
+  --status-rejected: #ef4444;
+  --status-rejected-bg: #fef2f2;
+
+  /* Problem Indications / Severity Colors */
+  --severity-low: #10b981;
+  --severity-low-bg: #ecfdf5;
+  --severity-low-border: #a7f3d0;
+
+  --severity-medium: #f59e0b;
+  --severity-medium-bg: #fffbeb;
+  --severity-medium-border: #fde68a;
+
+  --severity-high: #f97316;
+  --severity-high-bg: #fff7ed;
+  --severity-high-border: #ffedd5;
+
+  --severity-critical: #ef4444;
+  --severity-critical-bg: #fef2f2;
+  --severity-critical-border: #fecdd3;
+
+  /* Typography */
+  --font-heading: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Plus Jakarta Sans', sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', monospace;
+
+  /* Shadows - Soft Apple Elevation */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.12);
+  --shadow-gold-glow: 0 8px 30px rgba(212, 175, 55, 0.35);
+
+  /* Radius & Glassmorphism */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 30px;
+  --radius-full: 9999px;
+
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(212, 175, 55, 0.25);
+  --glass-backdrop: blur(20px) saturate(180%);
+
+  /* Transitions */
+  --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-normal: 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-slow: 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reset & Base Styles */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-body);
+  color: var(--color-navy-900);
+  background-color: var(--color-slate-100);
+  line-height: 1.47059;
+  letter-spacing: -0.022em;
+  -webkit-font-smoothing: antialiased;
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  background-color: var(--color-white);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--color-navy-900);
+  letter-spacing: -0.03em;
+}
+
+a {
+  color: var(--color-gold-700);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-gold-900);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Utility Helpers */
+.text-gold { color: var(--color-gold-500) !important; }
+.bg-gold { background: var(--gradient-gold) !important; color: white !important; }
+.border-gold { border-color: var(--color-gold-400) !important; }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
+}
+
+/* ==========================================================================
+   PERFORMANCE OPTIMIZATIONS — Image Display & Rendering
+   ========================================================================== */
+
+/* Fast image rendering on all img elements */
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  /* Use high-quality downscaling */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  /* GPU-accelerated compositing layer */
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  /* Prevent layout shift before image load */
+  background-color: var(--color-slate-100);
+}
+
+/* Report card thumbnails — fixed dimension box prevents reflow */
+.report-card-thumb,
+.image-preview-wrapper img,
+.hero-preview-card img {
+  contain: strict;
+  will-change: transform;
+}
+
+/* Off-screen content — defer paint cost */
+.report-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 320px;
+}
+
+/* Map containers — prevent compositor thrash */
+#public-map,
+#wizard-map,
+[id$="-detail-map"] {
+  will-change: transform;
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+/* Leaflet tile layer hardware compositing */
+.leaflet-tile-pane {
+  will-change: transform;
+}
+.leaflet-tile {
+  image-rendering: auto;
+}
+
+/* Smooth modal transition without layout jank */
+.modal-overlay,
+.modal-container {
+  will-change: opacity, transform;
+}
+
+/* Animations use GPU via transform & opacity only (no layout) */
+.pulse-dot,
+.ai-scan-overlay,
+.severity-critical {
+  will-change: opacity, box-shadow;
+}
+
+/* Flex/Grid container containment */
+.quick-stats-grid,
+.charts-grid,
+.map-report-list {
+  contain: layout;
+}
+
